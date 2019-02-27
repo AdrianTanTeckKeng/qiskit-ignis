@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # State tomography circuits for measurement in Pauli basis
 ###########################################################################
 
-def state_tomography_circuits(circuit, measured_qubits,
+def state_tomography_circuits(circuit, measured_qubits,special_labels=False,
                               meas_labels='Pauli', meas_basis='Pauli',):
     """
     Return a list of quantum state tomography circuits.
@@ -64,7 +64,7 @@ def state_tomography_circuits(circuit, measured_qubits,
         a subset of state tomography circuits for a partial tomography
         experiment use the general function `tomography_circuits`.
     """
-    return _tomography_circuits(circuit, measured_qubits, None,
+    return _tomography_circuits(circuit, measured_qubits, None, special_labels=special_labels,
                                 meas_labels=meas_labels, meas_basis=meas_basis,
                                 prep_labels=None, prep_basis=None)
 
@@ -74,7 +74,7 @@ def state_tomography_circuits(circuit, measured_qubits,
 ###########################################################################
 
 def process_tomography_circuits(circuit, measured_qubits,
-                                prepared_qubits=None,
+                                prepared_qubits=None, special_labels=False,
                                 meas_labels='Pauli', meas_basis='Pauli',
                                 prep_labels='Pauli', prep_basis='Pauli'):
     """
@@ -118,7 +118,7 @@ def process_tomography_circuits(circuit, measured_qubits,
         a subset of process tomography circuits for a partial tomography
         experiment use the general function `tomography_circuits`.
     """
-    return _tomography_circuits(circuit, measured_qubits, prepared_qubits,
+    return _tomography_circuits(circuit, measured_qubits, prepared_qubits, special_labels=special_labels,
                                 meas_labels=meas_labels, meas_basis=meas_basis,
                                 prep_labels=prep_labels, prep_basis=prep_basis)
 
@@ -127,7 +127,7 @@ def process_tomography_circuits(circuit, measured_qubits,
 # General state and process tomography circuit functions
 ###########################################################################
 
-def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,
+def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,special_labels=False,
                          meas_labels='Pauli', meas_basis='Pauli',
                          prep_labels=None, prep_basis=None):
     """
@@ -311,9 +311,12 @@ def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,
         prep_labels = _default_preparation_labels(prep_labels)
 
     # Generate n-qubit labels
-    meas_labels = _generate_labels(meas_labels, num_qubits)
+    if special_labels:
+        meas_labels = _generate_special_labels(meas_labels)
+    else:
+        meas_labels = _generate_labels(meas_labels, num_qubits)
     prep_labels = _generate_labels(prep_labels, num_qubits)
-
+    print("measure labels: ",meas_labels)
     # Note if the input circuit already has classical registers defined
     # the returned circuits add a new classical register for the tomography
     # measurments which will be inserted as the first classical register in
@@ -326,6 +329,7 @@ def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,
     # Generate the circuits
     qst_circs = []
     for pl in prep_labels:
+        print(pl)
         prep = QuantumCircuit(*registers)
         # Generate preparation circuit
         if pl is not None:
@@ -426,6 +430,20 @@ def _generate_labels(labels, measured_qubits):
         return labels
     raise ValueError(
         'Invalid labels specification: must be None, list, string, or tuple')
+
+def _generate_special_labels(labels):
+    """
+    Return list of reduced measurement circuit labels.
+    """
+    labels = []
+    labels.append(('X','X'))
+    labels.append(('Y','X'))
+    labels.append(('Y','Y'))
+    labels.append(('Y','Z'))
+    labels.append(('Z','X'))
+    labels.append(('Z','Y'))
+    labels.append(('Z','Z'))
+    return labels
 
 
 def _format_registers(*registers):
