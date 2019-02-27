@@ -30,9 +30,7 @@ print('Time taken:', time.time() - t)
 # Note that the None labels are because this is state tomography instead of process tomography
 # Process tomography would have the preparation state labels there
 
-tomo_counts_bell = tomo.tomography_data(job.result(), qst_bell)
-tomo_counts_bell.pop(('X','Y'),None)
-tomo_counts_bell.pop(('X','Z'),None)
+tomo_counts_bell = tomo.tomography_data(job.result(), qst_bell,efficient=True)
 #tomo_counts_bell.update({('X','I'): tomo_counts_bell[('X','X')]})
 #tomo_counts_bell.pop(('X','X'),None)
 for key in tomo_counts_bell:
@@ -43,7 +41,6 @@ print('-------------------------------------------------------------------------
 print(np.shape(probs_bell))
 print(np.shape(basis_matrix_bell))
 print(np.shape(weights_bell))
-dddd
 rho_bell = tomo.state_cvx_fit(probs_bell, basis_matrix_bell, weights_bell)
 F_bell = state_fidelity(psi_bell, rho_bell)
 print('Fit Fidelity =', F_bell)
