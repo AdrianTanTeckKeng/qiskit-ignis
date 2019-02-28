@@ -3,11 +3,11 @@ import numpy as np
 from scipy.optimize import minimize
 
 def pure_state_mle_fit(data, basis_matrix, weights = None):
-    # We are solving the least squares fit: minimize ||a * x - b ||_2
+    # We are minimizing sum_i |p_i - <psi| P_i |psi>|^2
     # where:
     #   a is the matrix of measurement operators
     #   b is the vector of expectation value data for each projector
-    #   x is the vectorized density matrix (or Choi-matrix) to be fitted
+    #   x is the vectorized density matrix to be fitted
     a = basis_matrix
     b = np.array(data)
 
@@ -37,3 +37,12 @@ def pure_state_mle_fit(data, basis_matrix, weights = None):
     for i in range(n):
         psi.append((opt_res.x[2*i]+1j*opt_res.x[2*i+1])/norm)
     return psi, opt_res.fun
+
+def pure_state_mle_fit_density_matrix(data, basis_matrix, weights = None):
+    psi, _ = pure_state_mle_fit(data, basis_matrix, weights)
+    n = len(psi)
+    rho = [[0 for i in range(n)] for j in range(n)]
+    for i in range(n):
+        for j in range(n):
+            rho[i][j] = psi[i].conj()*psi[j]
+    return np.array(rho)
