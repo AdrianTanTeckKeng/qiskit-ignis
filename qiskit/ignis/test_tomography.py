@@ -12,10 +12,10 @@ import sys, os
 
 sys.path.append(os.path.abspath(os.path.join('..')))
 #sys.path.append('~/projects/ibm_hackathon/qiskit-ignis/qiskit/ignis')
-from qiskit.ignis.verification import tomography as tomo
+from verification import tomography as tomo
 
-from qiskit.ignis.verification.tomography.fitters.pure_state_mle_fit import *
-from qiskit.ignis.mitigation import measurement as mc
+from verification.tomography.fitters.pure_state_mle_fit import *
+from mitigation import measurement as mc
 
 import matplotlib.pyplot as plt 
 
