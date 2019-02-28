@@ -30,12 +30,10 @@ from scipy.linalg import sqrtm
 # Setup circuit to generate |psi1>
 qr1 = QuantumRegister(2)
 bell1 = QuantumCircuit(qr1)
-bell1.ry(np.pi/2,qr1[0])
-bell1.rx(-np.pi/2,qr1[1])
-#bell1.h(qr1[0])
-#bell1.cx(qr1[0], qr1[1])
-#bell1.rx(-np.pi/2, qr1[0])
-#bell1.ry(np.pi/2, qr1[1])
+#bell1.ry(np.pi/2,qr1[0])
+#bell1.rx(-np.pi/2,qr1[1])
+bell1.h(qr1[0])
+bell1.cx(qr1[0], qr1[1])
 
 # get state |psi1> using statevector_simulator
 job = qiskit.execute(bell1, Aer.get_backend('statevector_simulator'))
@@ -43,8 +41,8 @@ psi1 = job.result().get_statevector(bell1)
 print("|psi1> = {}".format(psi1))
 
 def get_expectation_values(tomo_counts, shots=5000):
-    #operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
-    operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
+    operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
+    #operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
     #operators = ['XY']
     probs = []
     basis_matrix=[]
@@ -88,7 +86,7 @@ tomo_counts_psi2 = tomo.tomography_data(job.result(), qst_bell2)
 probs_psi2, basis_matrix = get_expectation_values(tomo_counts_psi2)
 
 # Generate probabilities of rho
-epsilon = 0
+epsilon = 0.1
 probs_rho = [(1-epsilon)*probs_psi1[i]+epsilon*probs_psi2[i] for i in range(len(probs_psi1))]
 
 # function for calculating inner product between states
@@ -109,8 +107,6 @@ print("=== Pure state tomography ===")
 psi_guess,_ = pure_state_mle_fit(probs_rho, basis_matrix)
 print("Guess for psi: {}".format(psi_guess))
 print("Fidelity: {}".format(inner_product(psi1, psi_guess)))
-ddd
-
 
 # On a noisy simulator:
 print("=== On Noisy simulator ===")
