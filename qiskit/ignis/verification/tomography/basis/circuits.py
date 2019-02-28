@@ -316,7 +316,6 @@ def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,special_
     else:
         meas_labels = _generate_labels(meas_labels, num_qubits)
     prep_labels = _generate_labels(prep_labels, num_qubits)
-    print("measure labels: ",meas_labels)
     # Note if the input circuit already has classical registers defined
     # the returned circuits add a new classical register for the tomography
     # measurments which will be inserted as the first classical register in
@@ -329,7 +328,6 @@ def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,special_
     # Generate the circuits
     qst_circs = []
     for pl in prep_labels:
-        print(pl)
         prep = QuantumCircuit(*registers)
         # Generate preparation circuit
         if pl is not None:
