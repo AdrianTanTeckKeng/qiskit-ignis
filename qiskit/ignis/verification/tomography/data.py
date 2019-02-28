@@ -62,9 +62,11 @@ def tomography_data(result, circuits,efficient=False):
     if efficient:
         data.pop(('X','Y'),None)
         data.pop(('X','Z'),None)
-        data.pop(('Y','Y'),None)
-        data.pop(('Y','Z'),None)
         data.pop(('X','X'),None)
+        #data.pop(('Y','Z'),None)
+        #data.pop(('Z','X'),None)
+        #data.pop(('Z','Y'),None)
+        #data.pop(('Y','Y'),None)
     return data
 
 
