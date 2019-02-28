@@ -71,9 +71,11 @@ def compute_expectation(nbits,key,data,shots):
 			expectation += prob_array[i]
 		else:
 			expectation -= prob_array[i]
+	key = key[-1::-1]
 	mat = sgm_matrices[:,:,indices(key[0])]
 	for i in range(1,nbits):
 		mat = np.kron(mat,sgm_matrices[:,:,indices(key[i])])
+	print(mat)
 	mat = np.reshape(mat,[4**nbits])
 	return expectation,mat
 
@@ -106,5 +108,5 @@ for i in range(0,N):
 	# Note that the None labels are because this is state tomography instead of process tomography
 	# Process tomography would have the preparation state labels there
 	tomo_counts_bell = tomo.tomography_data(job.result(), qst_bell)
-	expectation = compute_expectation(nbits,'IX',tomo_counts_bell,shots)
-	
+	expectation,mat = compute_expectation(nbits,'IX',tomo_counts_bell,shots)
+		
