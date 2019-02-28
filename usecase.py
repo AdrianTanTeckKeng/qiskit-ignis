@@ -30,8 +30,12 @@ from scipy.linalg import sqrtm
 # Setup circuit to generate |psi1>
 qr1 = QuantumRegister(2)
 bell1 = QuantumCircuit(qr1)
-bell1.h(qr1[0])
-bell1.cx(qr1[0], qr1[1])
+bell1.ry(np.pi/2,qr1[0])
+bell1.rx(-np.pi/2,qr1[1])
+#bell1.h(qr1[0])
+#bell1.cx(qr1[0], qr1[1])
+#bell1.rx(-np.pi/2, qr1[0])
+#bell1.ry(np.pi/2, qr1[1])
 
 # get state |psi1> using statevector_simulator
 job = qiskit.execute(bell1, Aer.get_backend('statevector_simulator'))
@@ -41,10 +45,15 @@ print("|psi1> = {}".format(psi1))
 def get_expectation_values(tomo_counts, shots=5000):
     #operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
     operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
+    #operators = ['XY']
     probs = []
     basis_matrix=[]
     for s in operators:
+        print("Tomo counts: ",tomo_counts)
         prob, mat = compute_expectation(2, s, tomo_counts, shots)
+        print("operator: {}".format(s))
+        print("exp: {}".format(prob))
+        print("mat: {}".format(mat))
         probs.append(prob)
         basis_matrix.append(mat)
     return probs, basis_matrix
@@ -55,6 +64,7 @@ job = qiskit.execute(qst_bell1, Aer.get_backend('qasm_simulator'), shots=5000)
 tomo_counts_psi1 = tomo.tomography_data(job.result(), qst_bell1)
 #probs_psi1, basis_matrix, _ = tomo.fitter_data(tomo_counts_psi1)
 probs_psi1, basis_matrix = get_expectation_values(tomo_counts_psi1)
+
 
 #Psi 2
 # Setup circuit to generate |psi2>
@@ -77,10 +87,8 @@ tomo_counts_psi2 = tomo.tomography_data(job.result(), qst_bell2)
 #probs_psi2, _ , _ = tomo.fitter_data(tomo_counts_psi2) # the basis_matrix is the same for both states
 probs_psi2, basis_matrix = get_expectation_values(tomo_counts_psi2)
 
-print("Shape", np.array(basis_matrix).shape)
-
 # Generate probabilities of rho
-epsilon = 0.3
+epsilon = 0
 probs_rho = [(1-epsilon)*probs_psi1[i]+epsilon*probs_psi2[i] for i in range(len(probs_psi1))]
 
 # function for calculating inner product between states
@@ -101,7 +109,7 @@ print("=== Pure state tomography ===")
 psi_guess,_ = pure_state_mle_fit(probs_rho, basis_matrix)
 print("Guess for psi: {}".format(psi_guess))
 print("Fidelity: {}".format(inner_product(psi1, psi_guess)))
-
+ddd
 
 
 # On a noisy simulator:

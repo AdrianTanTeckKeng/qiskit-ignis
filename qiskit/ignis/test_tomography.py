@@ -92,8 +92,8 @@ for i in range(0,N):
 		bell.u3(*rand_angles(),q2[j])
 	'''
 	
-	bell.h(q2[0])
-	bell.cx(q2[0],q2[1])
+	bell.ry(np.pi/2,q2[0])
+	bell.rx(-np.pi/2,q2[1])
 	job = qiskit.execute(bell, Aer.get_backend('statevector_simulator'))
 	psi_bell = job.result().get_statevector(bell)
 
@@ -108,5 +108,5 @@ for i in range(0,N):
 	# Note that the None labels are because this is state tomography instead of process tomography
 	# Process tomography would have the preparation state labels there
 	tomo_counts_bell = tomo.tomography_data(job.result(), qst_bell)
-	expectation,mat = compute_expectation(nbits,'IX',tomo_counts_bell,shots)
-		
+	expectation,mat = compute_expectation(nbits,'XY',tomo_counts_bell,shots)
+	print(expectation)	
