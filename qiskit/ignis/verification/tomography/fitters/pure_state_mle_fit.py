@@ -29,7 +29,7 @@ def pure_state_mle_fit(data, basis_matrix, weights = None):
                 for k in range(n):
                     psij = psi[2*j]+1j*psi[2*j+1]
                     psik = psi[2*k]+1j*psi[2*k+1]
-                    expectation_value+=(psij.conj()*psik*a[i][j+n*k])
+                    expectation_value+=(psij.conj()*psik*a[i][k+n*j])
             s += abs((b[i] - expectation_value))**2
         return s
 
