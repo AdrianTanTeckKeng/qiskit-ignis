@@ -37,12 +37,22 @@ job = qiskit.execute(bell1, Aer.get_backend('statevector_simulator'))
 psi1 = job.result().get_statevector(bell1)
 print("|psi1> = {}".format(psi1))
 
+def get_expectation_values(tomo_counts, shots=5000):
+    operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
+    probs = []
+    basis_matrix=[]
+    for s in operators:
+        prob, mat = compute_expectation(2, s, tomo_counts, shots)
+        probs.append(prob)
+        basis_matrix.append(probs)
+    return probs, basis_matrix
+
 # get expectation values of operators ... and convert the to the right format
 qst_bell1 = tomo.state_tomography_circuits(bell1, qr1)
 job = qiskit.execute(qst_bell1, Aer.get_backend('qasm_simulator'), shots=5000)
-tomo_counts_psi1 = tomo.tomography_data(job.result(), qst_bell1, efficient = True)
-probs_psi1, basis_matrix, _ = tomo.fitter_data(tomo_counts_psi1)
-
+tomo_counts_psi1 = tomo.tomography_data(job.result(), qst_bell1)
+#probs_psi1, basis_matrix, _ = tomo.fitter_data(tomo_counts_psi1)
+probs_psi1, basis_matrix = get_expectation_values(tomo_counts_psi1)
 
 #Psi 2
 # Setup circuit to generate |psi2>
@@ -62,7 +72,8 @@ print("|psi2> = {}".format(psi2))
 qst_bell2 = tomo.state_tomography_circuits(bell2, qr2)
 job = qiskit.execute(qst_bell2, Aer.get_backend('qasm_simulator'), shots=5000)
 tomo_counts_psi2 = tomo.tomography_data(job.result(), qst_bell2, efficient = True)
-probs_psi2, _ , _ = tomo.fitter_data(tomo_counts_psi2) # the basis_matrix is the same for both states
+#probs_psi2, _ , _ = tomo.fitter_data(tomo_counts_psi2) # the basis_matrix is the same for both states
+probs_psi2, basis_matrix = get_expectation_values(tomo_counts_psi2)
 
 
 # Generate probabilities of rho
@@ -132,7 +143,9 @@ print(noise_model)
 qst= tomo.state_tomography_circuits(circuit, qr)
 job = qiskit.execute(qst, Aer.get_backend('qasm_simulator'),noise_model=noise_model, coupling_map=coupling_map, basis_gates=basis_gates, shots=5000)
 tomo_counts = tomo.tomography_data(job.result(), qst, efficient = True)
-probs_psi, basis_matrix, _ = tomo.fitter_data(tomo_counts)
+#probs_psi, basis_matrix, _ = tomo.fitter_data(tomo_counts)
+probs_psi, basis_matrix = get_expectation_values(tomo_counts)
+
 
 # Full state tomography (maximum likelyhood approach)
 print("=== Full state tomography ===")
