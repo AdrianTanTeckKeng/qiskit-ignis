@@ -23,7 +23,7 @@ from qiskit import QuantumCircuit
 # Data formats for converting from counts to fitter data
 ###########################################################################
 
-def tomography_data(result, circuits,efficient=False):
+def tomography_data(result, circuits):
     """
     Extract tomography data from a QISKit Result object.
 
@@ -59,14 +59,6 @@ def tomography_data(result, circuits,efficient=False):
             data[tup] = marginal_counts(counts, range(len(tup[0])))
         else:
             data[tup] = counts
-    if efficient:
-        data.pop(('X','Y'),None)
-        data.pop(('X','Z'),None)
-        data.pop(('X','X'),None)
-        #data.pop(('Y','Z'),None)
-        #data.pop(('Z','X'),None)
-        #data.pop(('Z','Y'),None)
-        #data.pop(('Y','Y'),None)
     return data
 
 
