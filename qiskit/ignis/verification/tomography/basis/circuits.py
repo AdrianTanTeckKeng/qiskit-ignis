@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # State tomography circuits for measurement in Pauli basis
 ###########################################################################
 
-def state_tomography_circuits(circuit, measured_qubits,special_labels=False,
+def state_tomography_circuits(circuit, measured_qubits,
                               meas_labels='Pauli', meas_basis='Pauli',):
     """
     Return a list of quantum state tomography circuits.
@@ -64,7 +64,7 @@ def state_tomography_circuits(circuit, measured_qubits,special_labels=False,
         a subset of state tomography circuits for a partial tomography
         experiment use the general function `tomography_circuits`.
     """
-    return _tomography_circuits(circuit, measured_qubits, None, special_labels=special_labels,
+    return _tomography_circuits(circuit, measured_qubits, None,
                                 meas_labels=meas_labels, meas_basis=meas_basis,
                                 prep_labels=None, prep_basis=None)
 
@@ -74,7 +74,7 @@ def state_tomography_circuits(circuit, measured_qubits,special_labels=False,
 ###########################################################################
 
 def process_tomography_circuits(circuit, measured_qubits,
-                                prepared_qubits=None, special_labels=False,
+                                prepared_qubits=None,
                                 meas_labels='Pauli', meas_basis='Pauli',
                                 prep_labels='Pauli', prep_basis='Pauli'):
     """
@@ -118,7 +118,7 @@ def process_tomography_circuits(circuit, measured_qubits,
         a subset of process tomography circuits for a partial tomography
         experiment use the general function `tomography_circuits`.
     """
-    return _tomography_circuits(circuit, measured_qubits, prepared_qubits, special_labels=special_labels,
+    return _tomography_circuits(circuit, measured_qubits, prepared_qubits,
                                 meas_labels=meas_labels, meas_basis=meas_basis,
                                 prep_labels=prep_labels, prep_basis=prep_basis)
 
@@ -127,7 +127,7 @@ def process_tomography_circuits(circuit, measured_qubits,
 # General state and process tomography circuit functions
 ###########################################################################
 
-def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,special_labels=False,
+def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,
                          meas_labels='Pauli', meas_basis='Pauli',
                          prep_labels=None, prep_basis=None):
     """
@@ -237,7 +237,6 @@ def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,special_
         `sicpovm_preparation_circuit` may be invoked using the
         prep_circuit_fn='SIC'.
     """
-
     # Check for different prepared qubits
     if prepared_qubits is None:
         prepared_qubits = measured_qubits
@@ -309,10 +308,7 @@ def _tomography_circuits(circuit, measured_qubits, prepared_qubits=None,special_
         meas_labels = _default_measurement_labels(meas_labels)
     if isinstance(prep_labels, str):
         prep_labels = _default_preparation_labels(prep_labels)
-
     # Generate n-qubit labels
-    if special_labels:
-        meas_labels = _generate_special_labels(meas_labels)
     else:
         meas_labels = _generate_labels(meas_labels, num_qubits)
     prep_labels = _generate_labels(prep_labels, num_qubits)
