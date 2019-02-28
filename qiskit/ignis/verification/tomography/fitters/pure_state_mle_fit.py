@@ -18,6 +18,7 @@ def pure_state_mle_fit(data, basis_matrix, weights = None):
         b = w * b
 
     n = int(np.sqrt(len(a[0])))
+    print("n: ",n)
 
     def cost_function(psi):
         s = 0

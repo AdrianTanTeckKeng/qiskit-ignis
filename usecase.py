@@ -39,13 +39,14 @@ psi1 = job.result().get_statevector(bell1)
 print("|psi1> = {}".format(psi1))
 
 def get_expectation_values(tomo_counts, shots=5000):
-    operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
+    #operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
+    operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'XX', 'XY', 'XZ', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
     probs = []
     basis_matrix=[]
     for s in operators:
         prob, mat = compute_expectation(2, s, tomo_counts, shots)
         probs.append(prob)
-        basis_matrix.append(probs)
+        basis_matrix.append(mat)
     return probs, basis_matrix
 
 # get expectation values of operators ... and convert the to the right format
@@ -72,10 +73,11 @@ print("|psi2> = {}".format(psi2))
 # get expectation values of operators ... and convert the to the right format
 qst_bell2 = tomo.state_tomography_circuits(bell2, qr2)
 job = qiskit.execute(qst_bell2, Aer.get_backend('qasm_simulator'), shots=5000)
-tomo_counts_psi2 = tomo.tomography_data(job.result(), qst_bell2, efficient = True)
+tomo_counts_psi2 = tomo.tomography_data(job.result(), qst_bell2)
 #probs_psi2, _ , _ = tomo.fitter_data(tomo_counts_psi2) # the basis_matrix is the same for both states
 probs_psi2, basis_matrix = get_expectation_values(tomo_counts_psi2)
 
+print("Shape", np.array(basis_matrix).shape)
 
 # Generate probabilities of rho
 epsilon = 0.3
@@ -87,11 +89,11 @@ def inner_product(psi, phi):
 
 # Full state tomography (maximum likelyhood approach)
 print("=== Full state tomography ===")
-rho_full_mle = tomo.state_mle_fit(probs_rho, basis_matrix)
-eigenvalues, eigenvectors = np.linalg.eig(rho_full_mle)
-print("Eigenvalues of rho: {}".format(eigenvalues))
-print("Guess for psi: {}".format(eigenvectors[0]))
-print("Fidelity: {}".format(inner_product(psi1, eigenvectors[0])))
+#rho_full_mle = tomo.state_mle_fit(probs_rho, basis_matrix)
+#eigenvalues, eigenvectors = np.linalg.eig(rho_full_mle)
+#print("Eigenvalues of rho: {}".format(eigenvalues))
+#print("Guess for psi: {}".format(eigenvectors[0]))
+#print("Fidelity: {}".format(inner_product(psi1, eigenvectors[0])))
 
 
 # Pure state tomography (maximum likelyhood approach)
@@ -143,7 +145,7 @@ print(noise_model)
 
 qst= tomo.state_tomography_circuits(circuit, qr)
 job = qiskit.execute(qst, Aer.get_backend('qasm_simulator'),noise_model=noise_model, coupling_map=coupling_map, basis_gates=basis_gates, shots=5000)
-tomo_counts = tomo.tomography_data(job.result(), qst, efficient = True)
+tomo_counts = tomo.tomography_data(job.result(), qst)
 #probs_psi, basis_matrix, _ = tomo.fitter_data(tomo_counts)
 probs_psi, basis_matrix = get_expectation_values(tomo_counts)
 
