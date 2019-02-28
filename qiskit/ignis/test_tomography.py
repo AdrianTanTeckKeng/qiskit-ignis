@@ -53,16 +53,22 @@ def compute_expectation(nbits,key,data,shots):
 	new_data = data[new_key]
 	binary = np.zeros([2**nbits,nbits],dtype=np.int32)
 	binary_array = np.zeros([2**nbits,nbits],dtype=np.int32)
-	prob_array = np.zeros([2**nbits],dtype=np.int32)
+	prob_array = np.zeros([2**nbits])
 	for i in range(2**nbits):
 		binary = '{0:b}'.format(i).zfill(nbits)
+		print('binary:',binary)
+		print(new_data)
 		try:
 			if new_data[binary]:
-				prob_array[i] = new_data[binary]/shots
+				print(new_data[binary])
+				print(shots)
+				prob_array[i] = (new_data[binary]*1.0)/shots
+				print('prob array',prob_array[i])
 		except:
 			prob_array[i] = 0.
 		for j in range(nbits):
 			binary_array[i][j] = int(binary[j])
+	key = key[-1::-1]
 	binary_array = binary_array[:,findOccurrences(key,'I')]
 	binary_array = np.sum(binary_array,axis=1)
 	expectation = 0
@@ -71,11 +77,9 @@ def compute_expectation(nbits,key,data,shots):
 			expectation += prob_array[i]
 		else:
 			expectation -= prob_array[i]
-	key = key[-1::-1]
 	mat = sgm_matrices[:,:,indices(key[0])]
 	for i in range(1,nbits):
 		mat = np.kron(mat,sgm_matrices[:,:,indices(key[i])])
-	print(mat)
 	mat = np.reshape(mat,[4**nbits])
 	return expectation,mat
 
@@ -108,5 +112,3 @@ for i in range(0,N):
 	# Note that the None labels are because this is state tomography instead of process tomography
 	# Process tomography would have the preparation state labels there
 	tomo_counts_bell = tomo.tomography_data(job.result(), qst_bell)
-	expectation,mat = compute_expectation(nbits,'XY',tomo_counts_bell,shots)
-	print(expectation)	

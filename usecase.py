@@ -49,11 +49,11 @@ def get_expectation_values(tomo_counts, shots=5000):
     probs = []
     basis_matrix=[]
     for s in operators:
-        print("Tomo counts: ",tomo_counts)
+        #print("Tomo counts: ",tomo_counts)
         prob, mat = compute_expectation(2, s, tomo_counts, shots)
-        print("operator: {}".format(s))
-        print("exp: {}".format(prob))
-        print("mat: {}".format(mat))
+        #print("operator: {}".format(s))
+        #print("exp: {}".format(prob))
+        #print("mat: {}".format(mat))
         probs.append(prob)
         basis_matrix.append(mat)
     return probs, basis_matrix
@@ -97,11 +97,11 @@ def inner_product(psi, phi):
 
 # Full state tomography (maximum likelyhood approach)
 print("=== Full state tomography ===")
-#rho_full_mle = tomo.state_mle_fit(probs_rho, basis_matrix)
-#eigenvalues, eigenvectors = np.linalg.eig(rho_full_mle)
-#print("Eigenvalues of rho: {}".format(eigenvalues))
-#print("Guess for psi: {}".format(eigenvectors[0]))
-#print("Fidelity: {}".format(inner_product(psi1, eigenvectors[0])))
+rho_full_mle = tomo.state_mle_fit(probs_rho, basis_matrix)
+eigenvalues, eigenvectors = np.linalg.eig(rho_full_mle)
+print("Eigenvalues of rho: {}".format(eigenvalues))
+print("Guess for psi: {}".format(eigenvectors[0]))
+print("Fidelity: {}".format(inner_product(psi1, eigenvectors[0])))
 
 
 # Pure state tomography (maximum likelyhood approach)
