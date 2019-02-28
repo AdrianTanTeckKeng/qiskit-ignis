@@ -10,6 +10,7 @@ from qiskit import Aer, IBMQ, execute
 from qiskit.providers.aer import noise
 
 from qiskit.ignis.verification.tomography.fitters.pure_state_mle_fit import pure_state_mle_fit, pure_state_mle_fit_density_matrix
+from qiskit.ignis.test_tomography import *
 
 from scipy.linalg import sqrtm
 

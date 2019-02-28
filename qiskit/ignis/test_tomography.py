@@ -11,11 +11,11 @@ from qiskit.providers.aer import noise
 import sys, os
 
 sys.path.append(os.path.abspath(os.path.join('..')))
-#sys.path.append('/Users/atanteck/Desktop/project/qiskit-ignis/qiskit/ignis')
-from verification import tomography as tomo
+#sys.path.append('~/projects/ibm_hackathon/qiskit-ignis/qiskit/ignis')
+from qiskit.ignis.verification import tomography as tomo
 
-from verification.tomography.fitters.pure_state_mle_fit import *
-from mitigation import measurement as mc
+from qiskit.ignis.verification.tomography.fitters.pure_state_mle_fit import *
+from qiskit.ignis.mitigation import measurement as mc
 
 import matplotlib.pyplot as plt 
 
