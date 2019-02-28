@@ -56,14 +56,9 @@ def compute_expectation(nbits,key,data,shots):
 	prob_array = np.zeros([2**nbits])
 	for i in range(2**nbits):
 		binary = '{0:b}'.format(i).zfill(nbits)
-		print('binary:',binary)
-		print(new_data)
 		try:
 			if new_data[binary]:
-				print(new_data[binary])
-				print(shots)
 				prob_array[i] = (new_data[binary]*1.0)/shots
-				print('prob array',prob_array[i])
 		except:
 			prob_array[i] = 0.
 		for j in range(nbits):
