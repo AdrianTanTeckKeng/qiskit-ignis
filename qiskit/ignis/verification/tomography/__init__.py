@@ -18,6 +18,9 @@ from . import basis
 # Tomography data formatting
 from .data import tomography_data
 
+# New tomograhy functions
+from .tomo_fncs import *
+
 # Tomography data fitting
 from .fitters import fitter_data
 from .fitters import state_mle_fit
