@@ -10,7 +10,6 @@ from qiskit import Aer, IBMQ, execute
 from qiskit.providers.aer import noise
 
 from verification.tomography.fitters.pure_state_mle_fit import *
-from test_tomography import *
 
 from scipy.linalg import sqrtm
 
@@ -31,15 +30,15 @@ from scipy.linalg import sqrtm
 nbits = 3
 qr1 = QuantumRegister(nbits)
 bell1 = QuantumCircuit(qr1)
-#bell1.ry(np.pi/2,qr1[0])
-#bell1.rx(-np.pi/2,qr1[1])
+
 bell1.h(qr1[0])
 bell1.cx(qr1[0], qr1[1])
+bell1.cx(qr1[1], qr1[2])
 
 # get state |psi1> using statevector_simulator
 job = qiskit.execute(bell1, Aer.get_backend('statevector_simulator'))
 psi1 = job.result().get_statevector(bell1)
-print("|psi1> = {}".format(psi1))
+#print("|psi1> = {}".format(psi1))
 
 def get_expectation_values(tomo_counts,nbits, shots=5000):
     #operators = ['II', 'IX', 'IY', 'IZ', 'XI', 'YX', 'YY', 'YZ', 'ZX', 'ZY', 'ZZ']
@@ -50,7 +49,7 @@ def get_expectation_values(tomo_counts,nbits, shots=5000):
     basis_matrix=[]
     for s in operators:
         #print("Tomo counts: ",tomo_counts)
-        prob, mat = compute_expectation(nbits, s, tomo_counts, shots)
+        prob, mat = tomo.compute_expectation(nbits, s, tomo_counts, shots)
         #print("operator: {}".format(s))
         #print("exp: {}".format(prob))
         #print("mat: {}".format(mat))
@@ -70,14 +69,13 @@ probs_psi1, basis_matrix = get_expectation_values(tomo_counts_psi1,nbits)
 # Setup circuit to generate |psi2>
 qr2 = QuantumRegister(nbits)
 bell2 = QuantumCircuit(qr2)
-bell2.y(qr2[0])
 bell2.h(qr2[0])
 bell2.cx(qr2[0], qr2[1])
-
+bell2.cx(qr2[1], qr2[2])
 # get state |psi2> using statevector_simulator
 job = qiskit.execute(bell2, Aer.get_backend('statevector_simulator'))
 psi2 = job.result().get_statevector(bell2)
-print("|psi2> = {}".format(psi2))
+#print("|psi2> = {}".format(psi2))
 
 
 # get expectation values of operators ... and convert the to the right format
@@ -96,35 +94,40 @@ def inner_product(psi, phi):
     return np.abs(sum([psi[i].conj()*phi[i] for i in range(len(psi))]))**2
 
 # Full state tomography (maximum likelyhood approach)
-print("=== Full state tomography ===")
+print("=== IBM state tomography ===")
 rho_full_mle = tomo.state_mle_fit(probs_rho, basis_matrix)
 eigenvalues, eigenvectors = np.linalg.eig(rho_full_mle)
-print("Eigenvalues of rho: {}".format(eigenvalues))
-print("Guess for psi: {}".format(eigenvectors[0]))
+#print("Eigenvalues of rho: {}".format(eigenvalues))
+#print("Guess for psi: {}".format(eigenvectors[0]))
 print("Fidelity: {}".format(inner_product(psi1, eigenvectors[0])))
 
 
 # Pure state tomography (maximum likelyhood approach)
-print("=== Pure state tomography ===")
+print("=== Our own pure state tomography ===")
 psi_guess,_ = pure_state_mle_fit(probs_rho, basis_matrix)
-print("Guess for psi: {}".format(psi_guess))
+#print("Guess for psi: {}".format(psi_guess))
 print("Fidelity: {}".format(inner_product(psi1, psi_guess)))
 
 # On a noisy simulator:
 print("=== On Noisy simulator ===")
 qr = QuantumRegister(nbits)
 circuit = QuantumCircuit(qr)
+
+'''
 params = np.random.rand(12)
 circuit.u3(params[0], params[1], params[2], qr[0])
 circuit.u3(params[3], params[4], params[5], qr[1])
 circuit.cx(qr[0], qr[1])
 circuit.u3(params[6], params[7], params[8], qr[0])
 circuit.u3(params[9], params[10], params[11], qr[1])
-
+'''
+circuit.h(qr[0])
+circuit.cx(qr[0], qr[1])
+circuit.cx(qr[1], qr[2])
 
 job = qiskit.execute(circuit, Aer.get_backend('statevector_simulator'))
 psi = job.result().get_statevector(circuit)
-print("psi: {}".format(psi))
+#print("psi: {}".format(psi))
 
 
 IBMQ.enable_account('a6140115a9d2692b8a711d0f31fdc92b7ae793865719445a78fc210220de52765da18d0eab774d245fbc9e5f40c94e99d9c536f9f1749acd7b902b3bd9931dd5')
@@ -147,7 +150,7 @@ basis_gates = noise_model.basis_gates
 # Select the QasmSimulator from the Aer provider
 simulator = Aer.get_backend('qasm_simulator')
 
-print(noise_model)
+#print(noise_model)
 
 qst= tomo.state_tomography_circuits(circuit, qr)
 job = qiskit.execute(qst, Aer.get_backend('qasm_simulator'),noise_model=noise_model, coupling_map=coupling_map, basis_gates=basis_gates, shots=5000)
@@ -157,17 +160,17 @@ probs_psi, basis_matrix = get_expectation_values(tomo_counts,nbits)
 
 
 # Full state tomography (maximum likelyhood approach)
-print("=== Full state tomography ===")
+print("=== IBM tomography ===")
 rho_full_mle = tomo.state_mle_fit(probs_psi, basis_matrix)
 eigenvalues, eigenvectors = np.linalg.eig(rho_full_mle)
-print("Eigenvalues of rho: {}".format(eigenvalues))
-print("Guess for psi: {}".format(eigenvectors[0]))
+#print("Eigenvalues of rho: {}".format(eigenvalues))
+#print("Guess for psi: {}".format(eigenvectors[0]))
 print("Fidelity: {}".format(inner_product(psi, eigenvectors[0])))
 
 
 # Pure state tomography (maximum likelyhood approach)
-print("=== Pure state tomography ===")
+print("=== Our own pure state tomography ===")
 psi_guess,_ = pure_state_mle_fit(probs_psi, basis_matrix)
-print("Guess for psi: {}".format(psi_guess))
+#print("Guess for psi: {}".format(psi_guess))
 print("Fidelity: {}".format(inner_product(psi, psi_guess)))
 
