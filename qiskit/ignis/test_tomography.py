@@ -12,7 +12,7 @@ import sys, os
 sys.path.append(os.path.abspath(os.path.join('..')))
 #sys.path.append('/Users/atanteck/Desktop/project/qiskit-ignis/qiskit/ignis')
 from verification import tomography as tomo
-from verification.tomography.fitters.pure_state_mle_fit import pure_state_mle_fit
+from verification.tomography.fitters.pure_state_mle_fit import *
 from mitigation import measurement as mc
 
 import matplotlib.pyplot as plt 
@@ -57,11 +57,10 @@ for i in range(0,N):
 		print(key,":",tomo_counts_bell[key])
 	# Generate fitter data and reconstruct density matrix
 	probs_bell, basis_matrix_bell, weights_bell = tomo.fitter_data(tomo_counts_bell)
-	rho_bell = pure_state_mle_fit(probs_bell, basis_matrix_bell, weights_bell)
+	rho_bell = pure_state_mle_fit_density_matrix(probs_bell, basis_matrix_bell, weights_bell)
 	#rho_bell = rho_bell[0][0]
 	print(rho_bell[0][0]/rho_bell[0][1])
 	#print(type(rho_bell[0][0]))
-	ddddd
 	F_bell = state_fidelity(psi_bell, rho_bell)
 	f_list.append(F_bell)
 	print('Circuit: ',i,' ','Fit Fidelity =', F_bell)

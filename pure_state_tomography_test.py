@@ -39,7 +39,7 @@ psi_bell2_real = job.result().get_statevector(bell2)
 rho_bell_real = [[0 for i in range(len(psi_bell1_real))] for j in range(len(psi_bell1_real))]
 for i in range(len(psi_bell1_real)):
     for j in range(len(psi_bell2_real)):
-        rho_bell_real[i][j] = 0.9 * psi_bell1_real[i].conj()*psi_bell1_real[j] + 0.1 * psi_bell2_real[i].conj()*psi_bell2_real[j]
+        rho_bell_real[i][j] = 0.8 * psi_bell1_real[i].conj()*psi_bell1_real[j] + 0.2 * psi_bell2_real[i].conj()*psi_bell2_real[j]
 
 qst_bell2 = tomo.state_tomography_circuits(bell2, qr2)
 job = qiskit.execute(qst_bell2, Aer.get_backend('qasm_simulator'), shots=5000)
@@ -48,14 +48,14 @@ tomo_counts_bell2 = tomo.tomography_data(job.result(), qst_bell2, efficient = Tr
 
 probs_bell2, _, _ = tomo.fitter_data(tomo_counts_bell2)
 
-probs_total = [0.9*probs_bell1[i]+0.1*probs_bell2[i] for i in range(len(probs_bell1))]
+probs_total = [0.8*probs_bell1[i]+0.2*probs_bell2[i] for i in range(len(probs_bell1))]
 
 psi_bell, diff = pure_state_mle_fit(probs_total, basis_matrix_bell)
 pure_mle_fidelity = 0
 for i in range(len(psi_bell)):
     for j in range(len(psi_bell)):
         pure_mle_fidelity += psi_bell[i].conj()*psi_bell[j]*rho_bell_real[i][j]
-#my_fidel = sum([psi_bell[i]*psi_bell_real[i] for i in range(len(psi_bell))])
+my_fidel = sum([psi_bell[i]*psi_bell1_real[i] for i in range(len(psi_bell))])
 print("Psi: {}".format(psi_bell))
 print("Diff: {}".format(diff))
 #rho = pure_state_mle_fit_density_matrix(probs_bell, basis_matrix_bell)
@@ -65,8 +65,13 @@ rho_full_mle = tomo.state_mle_fit(probs_total, basis_matrix_bell)
 #F_bell = state_fidelity(psi_bell, rho_full_mle)
 
 full_mle_fidelity = np.trace(sqrtm(sqrtm(rho_full_mle).dot(rho_bell_real).dot(sqrtm(rho_full_mle))))
-print("Full fidelity: ", full_mle_fidelity)
-print("Pure fidelity: ", pure_mle_fidelity)
+#print("Full fidelity: ", full_mle_fidelity)
+#print("Pure fidelity: ", pure_mle_fidelity)
+
+print("Dist pure: ", my_fidel)
+psi_full_first = np.linalg.eig(rho_full_mle)[1][0]
+my_fidel2 = sum([psi_full_first[i]*psi_bell1_real[i] for i in range(len(psi_bell))])
+print("Dist full: ", my_fidel2)
 
 #print('Fit Fidelity =', F_bell)
 #print('my fidelity =', my_fidel)
